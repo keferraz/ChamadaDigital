@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <title>Historico de registros</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <?!= incluirRecursosExternos(); ?>
+  <style>
+    :root { --color1:#f4f4f4; --color2:#fff; --color3:#6bc287; --color4:#f4a261; --color5:#0f2e2b; }
+    h2{ color:var(--color4); }
+    body{ font-family:Arial,sans-serif; background:var(--color1); margin:0 }
+    header{ background:var(--color2); position:fixed; top:0; width:100%; z-index:1000; box-shadow:1px 1px 5px rgba(0,0,0,.1) }
+    .navbar{ display:flex; justify-content:center; align-items:center; height:80px; padding:0 20px }
+    .navbar-content{ display:flex; align-items:center; width:100%; max-width:1200px; justify-content:space-between }
+    .navbar h1{ margin:0; color:var(--color4); font-size:24px }
+    main{ padding:120px 20px 20px }
+    .content{ max-width:90%; margin:0 auto; padding:20px; background:var(--color2); border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,.1); text-align:left }
+    .form-row{ display:flex; gap:10px; align-items:center; margin-top:10px }
+    select, input[type="text"]{ padding:10px; border-radius:10px; border:2px solid var(--color3) }
+    .tabela-scroll{ max-height:420px; overflow-y:auto; margin-top:10px }
+    table{ width:100%; border-collapse:collapse; font-size:12px }
+    thead th{ position:sticky; top:0; background:var(--color3); color:#fff; z-index:1 }
+    th, td{ padding:8px; border:1px solid #ccc; text-align:center; font-size:11px }
+    .status-select{ width:100%; border:none; background: transparent; }
+
+    .botao-fixo{ background:var(--color3); color:#fff; font-weight:bold; border:none; padding:10px 20px; cursor:pointer; border-radius:10px }
+    .botoes-container{ display:flex; justify-content:flex-end; align-items:center; margin-top:14px; gap:10px }
+
+    /* Paleta de status (aplica também dentro do select) */
+    .status-verde, .status-verde * { background-color:#6bc287 !important; color:#fff !important; font-weight:bold; }
+    .status-verde2, .status-verde2 * { background-color:#274e13 !important; color:#d9ead3 !important; font-weight:bold; }
+    .status-laranja, .status-laranja * { background-color:#fff2cc !important; color:#783f04 !important; font-weight:bold; }
+    .status-laranjaForte, .status-laranjaForte * { background-color:#783f04 !important; color:#fff2cc !important; font-weight:bold; }
+    .status-vermelho, .status-vermelho * { background-color:#e76f51 !important; color:#fff !important; font-weight:bold; }
+    .status-roxo, .status-roxo * { background-color:#be4ac9 !important; color:#fff !important; font-weight:bold; }
+    .status-roxoFraco, .status-roxoFraco * { background-color:#d9d2e9 !important; color:#be4ac9 !important; font-weight:bold; }
+    .status-azul, .status-azul * { background-color:#c9daf8 !important; color:#0c343d !important; font-weight:bold; }
+    .status-azul2, .status-azul2 * { background-color:#0c343d !important; color:#c9daf8 !important; font-weight:bold; }
+    .status-nao-definido, .status-nao-definido * { background:#111 !important; color:#fff !important; }
+
+    /* Cores para TURMA_ESCALA (escala) */
+    .turma-a   { background:#fe5858; color:#fff; font-weight:bold; }
+    .turma-b   { background:#ffd965; color:#fff; font-weight:bold; }
+    .turma-c   { background:#00ffff; color:#000; font-weight:bold; }
+    .turma-d   { background:#bcbdf0; color:#fff; font-weight:bold; }
+    .turma-dom { background:#ccc; color:#000; font-weight:bold; }
+    .turma-sab { background:#e6b8af; color:#000; font-weight:bold; }
+    .turma-adm { background:#434343; color:#fff; font-weight:bold; }
+
+    #logo{ width:50px; height:50px }
+    .versionCode{ color:#999; font-weight:bold } .versionCode .versionCode2{ color:#f4a261; font-weight:bold }
+    #loading-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:3000; display:none; align-items:center; justify-content:center }
+    .spinner{ color:#fff; font-size:18px; font-weight:bold; background:var(--color3); padding:16px 24px; border-radius:10px; box-shadow:0 0 15px #ffd965 }
+  </style>
+</head>
+<body>
+<header>
+  <div class="navbar">
+    <div class="navbar-content">
+      <img src="https://lh5.googleusercontent.com/proxy/OWOdTJ1zkkZ7YU0-dpOIK9TjofSs6nimeI7LfWgZJFC0Ru0n4LlZMiGMAiCkywPe1jTXPrLNB_Q9X09pVQb0YZZ3AOoM-EJ8POnVioajQuCP0EPLj7KIVJpCCA" id="logo"/>
+      <h1>Historico de registros</h1>
+      <div></div>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="content">
+    <h2>Selecione o Team Leader e as datas</h2>
+    <div class="form-row">
+      <select id="nome">
+        <option disabled selected>Selecione um Team Leader</option>
+      </select>
+      <input type="text" id="datasSelecionadas" placeholder="Selecione as datas" readonly />
+      <button onclick="enviarNome()" class="botao-fixo">🔍 Buscar</button>
+    </div>
+    <div id="resultado">
+      <div class="tabela-scroll"></div>
+    </div>
+    <div class="botoes-container" id="botoes-container"></div>
+  </div>
+</main>
+
+<div id="loading-overlay"><div class="spinner" id="loading-text">Processando...</div></div>
+<center><span class="versionCode">Versão 0.<span class="versionCode2">1</span>.5</span></center>
+
+<script>
+  // --------- Flatpickr com bloqueio: passado somente até 2 dias; futuro liberado ---------
+  function initDatepicker() {
+    if (window.flatpickr) {
+      const hasPT = window.flatpickr.l10ns && window.flatpickr.l10ns.pt;
+      const hoje = new Date();
+      const minDate = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - 2);
+
+      flatpickr("#datasSelecionadas", {
+        mode: "multiple",
+        dateFormat: "d/m/Y",
+        minDate: minDate,
+        ...(hasPT ? { locale: window.flatpickr.l10ns.pt } : {}),
+        onChange: function(selectedDates, dateStr, instance) {
+          const filtradas = selectedDates.filter(d => {
+            const dd = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            return dd >= new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate());
+          });
+          if (filtradas.length !== selectedDates.length) {
+            instance.setDate(filtradas, true);
+            alert("Só é permitido consultar hoje, ontem, anteontem e qualquer data futura.");
+          }
+        }
+      });
+    } else {
+      setTimeout(initDatepicker, 50);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    initDatepicker();
+
+    google.script.run.withSuccessHandler(function (teamleaders) {
+      const select = document.getElementById("nome");
+      teamleaders
+        .sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR',{sensitivity:'base'}))
+        .forEach(tl => {
+          const o = document.createElement("option");
+          o.value = tl.nome; o.text = tl.nome;
+          select.appendChild(o);
+        });
+    }).obterTeamLeaders();
+  });
+
+  function mostrarOverlay(txt){ document.getElementById("loading-text").textContent = txt || "Processando..."; document.getElementById("loading-overlay").style.display="flex"; }
+  function ocultarOverlay(){ document.getElementById("loading-overlay").style.display="none"; }
+
+  // Lista de status com QTD_DIAS
+  const STATUS_COM_QTD = [
+    "OWNboarding","Atestado","Banco-de-Horas","Afastamento","Licenca","Atestado-Acd-Trab","Ferias",
+    "Treinamento-Ext","Treinamento-Int","Treinamento-REP-III","Fretado","Afastamento-Acd-Trab",
+    "Sinergia SP014","Sinergia CX","Sinergia INB","Sinergia LOS","Sinergia MG01","Sinergia MWH",
+    "Sinergia OUT","Sinergia QUA","Sinergia RC01","Sinergia RET","Sinergia SP011","Sinergia SP02",
+    "Sinergia SP03","Sinergia SP04","Sinergia SP05","Sinergia SP06","Sinergia SP09","Sinergia INV",
+    "Sinergia SVC","Sinergia RC-SP10","Sinergia Sortation","Sinergia Insumo","Atividade-Externa","Suspensao"
+  ];
+
+  let ALERT_QTD_ONCE = false;
+
+  function enviarNome(){
+    const nome = document.getElementById("nome").value;
+    const strDatas = document.getElementById("datasSelecionadas").value || "";
+    let datasSelecionadas = strDatas.split(",").map(s=>s.trim()).filter(s=>s);
+
+    if(!nome){ alert("Selecione um Team Leader."); return; }
+    if(datasSelecionadas.length === 0){ alert("Selecione ao menos uma data."); return; }
+
+    const min = (function(){ const h = new Date(); return new Date(h.getFullYear(), h.getMonth(), h.getDate() - 2); })();
+    const toDate = (ddmmyyyy) => { const [dd,mm,yyyy] = ddmmyyyy.split("/").map(n=>parseInt(n,10)); return new Date(yyyy, mm-1, dd, 0,0,0,0); };
+    const antigas = [];
+    datasSelecionadas = datasSelecionadas.filter(d=>{
+      const ok = toDate(d) >= new Date(min.getFullYear(), min.getMonth(), min.getDate());
+      if (!ok) antigas.push(d);
+      return ok;
+    });
+    if (antigas.length > 0) alert("Removidas por regra (apenas até 2 dias antes de hoje):\n" + antigas.join(", "));
+    if (datasSelecionadas.length === 0){ alert("Nenhuma data elegível após o filtro. Selecione hoje, ontem, anteontem ou datas futuras."); return; }
+
+    mostrarOverlay("Carregando registros do histórico...");
+    google.script.run.withSuccessHandler(function (dados) {
+      ocultarOverlay();
+      montarTabelaEdicao(dados, datasSelecionadas.length);
+    }).withFailureHandler(function (err) {
+      ocultarOverlay();
+      alert("Erro ao buscar histórico: " + err.message);
+    }).obterHistoricoPorDatas(nome, datasSelecionadas);
+  }
+
+  function montarTabelaEdicao(dados, qtdDatasSel){
+    const cont = document.querySelector(".tabela-scroll");
+    if(!dados || dados.length === 0){
+      cont.innerHTML = "<p>❌ Nenhum registro encontrado para os filtros.</p>";
+      return;
+    }
+
+    let html = `<table>
+      <thead>
+        <tr>
+          <th>AREA_HEAD</th>
+          <th>LDAP</th>
+          <th>COLABORADOR</th>
+          <th>TURNO</th>
+          <th>TURMA_ESCALA</th>
+          <th>STATUS_HC</th>
+          <th>STATUS</th>
+          <th>QTD_DIAS</th>
+          <th>DATA</th>
+          <th>Quem registrou</th>
+        </tr>
+      </thead><tbody>`;
+
+    dados.forEach((l) => {
+      const statusAtual = l.STATUS_abs || "";
+      const classStatus = statusAbsClass(statusAtual);
+      const classHC     = statusHCClass(l.STATUS_HC || "");
+      const classTurma  = turmaClass(l.TURMA_ESCALA || "");
+      const temQtd = STATUS_COM_QTD.includes(statusAtual);
+
+      html += `<tr data-editado="false">
+        <td>${l.AREA_HEAD || ""}</td>
+        <td>${l.LDAP || ""}</td>
+        <td>${l.COLABORADOR || ""}</td>
+        <td>${l.TURNO || ""}</td>
+        <td class="${classTurma}">${l.TURMA_ESCALA || ""}</td>
+        <td class="${classHC}">${l.STATUS_HC || ""}</td>
+        <td class="${classStatus}">
+          <select class="status-select"
+                  data-nome="${escapeAttr(l.COLABORADOR)}"
+                  data-turno="${escapeAttr(l.TURNO)}"
+                  data-empresa="${escapeAttr(l.EMPRESA)}"
+                  data-processo="${escapeAttr(l.PROCESSO)}"
+                  data-dataref="${escapeAttr(l.DATA)}"
+                  data-original="${escapeAttr(statusAtual)}"
+                  onchange="marcarEditado(this); toggleQtdDiasInput(this, ${qtdDatasSel}); aplicarCorSelect(this);">
+            ${opcoesStatus(statusAtual)}
+          </select>
+        </td>
+        <td>
+          ${temQtd
+            ? `<input type="number" class="qtd-dias" min="1" value="${l.QTD_DIAS || ""}" style="width:100%;${qtdDatasSel>1?'display:none;':''}" oninput="marcarEditado(this)" />`
+            : `<input type="number" class="qtd-dias" min="1" value="" style="display:none;width:100%;" oninput="marcarEditado(this)" />`
+          }
+        </td>
+        <td>${l.DATA || ""}</td>
+        <td>${l.USUARIO || ""}</td>
+      </tr>
+      <tr class="campo-motivo-desligamento" style="display:none;">
+        <td colspan="9">
+          <input type="text" class="motivo-input" placeholder="Motivo do desligamento (opcional)" style="width:100%;" oninput="marcarEditado(this)" />
+        </td>
+      </tr>`;
+    });
+
+    html += `</tbody></table>`;
+    cont.innerHTML = html;
+
+    // aplica cor inicial nos selects e toggle do motivo
+    document.querySelectorAll(".status-select").forEach(sel=>{
+      aplicarCorSelect(sel);
+      sel.addEventListener("change", function(){
+        const row = this.closest("tr");
+        const motivoRow = row.nextElementSibling;
+        if(["Desligado"].includes(this.value)){ motivoRow.style.display = ""; }
+        else { motivoRow.style.display = "none"; }
+      });
+    });
+
+    // Botão salvar
+    const bc = document.getElementById("botoes-container");
+    bc.innerHTML = "";
+    const botaoRegistrar = document.createElement("button");
+    botaoRegistrar.textContent = "Registrar Todos";
+    botaoRegistrar.className = "botao-fixo";
+    botaoRegistrar.id = "botao-registrar";
+    botaoRegistrar.onclick = registrarTodos;
+    bc.appendChild(botaoRegistrar);
+  }
+
+  // ======= Helpers de cor =======
+  function statusAbsClass(s){
+    if (["Presente","Treinamento-Int","Treinamento-REP-III","Treinamento-Ext"].includes(s)) return "status-verde";
+    if (s === "Presenca-HE") return "status-verde2";
+    if (["Afastamento","Atestado","Declaracao-de-Horas","Decl-Medica"].includes(s)) return "status-laranja";
+    if (["Licenca","Transferido"].includes(s)) return "status-laranjaForte";
+    if (s === "Banco-de-Horas") return "status-roxo";
+    if (["Sinergia SP014","Sinergia CX","Sinergia INB","Sinergia LOS","Sinergia MG01","Sinergia MWH","Sinergia OUT","Sinergia QUA","Sinergia RC01","Sinergia RET","Sinergia SP011","Sinergia SP02","Sinergia SP03","Sinergia SP04","Sinergia SP05","Sinergia SP06","Sinergia SP09","Sinergia INV","Sinergia SVC","Sinergia RC-SP10","Sinergia Sortation","Sinergia Insumo"].includes(s)) return "status-roxoFraco";
+    if (["Folga-Escala","OWNboarding"].includes(s)) return "status-azul";
+    if (s === "Ferias") return "status-azul2";
+    if (["Desligado","Falta"].includes(s)) return "status-vermelho";
+    return "status-nao-definido";
+  }
+  function statusHCClass(s){
+    const v = (s||"").toUpperCase();
+    if (v === "DESLIGADO") return "status-vermelho";
+    if (["AFASTADO","AFASTADA GRAVIDEZ","AFASTADO INSS"].includes(v)) return "status-laranja";
+    if (v === "ATIVO") return "status-verde";
+    return "";
+  }
+  function turmaClass(v){
+    const k = (v||"").toString().trim().toLowerCase();
+    if (!k) return "";
+    // mapeia 'A','B','C','D','DOM','SAB','ADM' -> classes
+    if (["a","b","c","d","dom","sab","adm"].includes(k)) return "turma-"+k;
+    // fallback: se vier "TURMA A" etc.
+    const m = k.match(/(a|b|c|d|dom|sab|adm)/);
+    return m ? ("turma-"+m[1]) : "";
+  }
+
+  function opcoesStatus(sel){
+    const lista = ["","Folga-Escala","Falta","Atestado","Atestado-Acd-Trab","Decl-Medica","Declaracao-de-Horas","Desligado","Presente","Presenca-HE","Banco-de-Horas","Transferido","Transferido-Area","Treinamento-Ext","Treinamento-Int","Treinamento-REP-III","Ferias","Fretado","Afastamento","Afastamento-Acd-Trab","Licenca","Sinergia SP014","Sinergia CX","Sinergia INB","Sinergia LOS","Sinergia MG01","Sinergia MWH","Sinergia OUT","Sinergia QUA","Sinergia RC01","Sinergia RET","Sinergia SP011","Sinergia SP02","Sinergia SP03","Sinergia SP04","Sinergia SP05","Sinergia SP06","Sinergia SP09","Sinergia INV","Sinergia RET","Sinergia QUA","Sinergia SVC","Sinergia RC-SP10","Sinergia Sortation","Sinergia Insumo","Atividade-Externa","OWNboarding","Suspensao"];
+    return lista.map(o => `<option value="${o}">${o || "Selecione"}</option>`).join("")
+                 .replace(`value="${sel}">`, `value="${sel}" selected>`);
+  }
+
+  function aplicarCorSelect(select) {
+    // remove classes anteriores
+    select.classList.remove('status-verde','status-verde2','status-laranja','status-laranjaForte','status-vermelho','status-roxo','status-roxoFraco','status-azul','status-azul2','status-nao-definido');
+    // aplica conforme valor
+    const v = select.value || "";
+    select.classList.add(statusAbsClass(v));
+  }
+
+  function escapeAttr(v){ return (v||"").toString().replace(/"/g,'&quot;'); }
+  function marcarEditado(el){ const tr = el.closest("tr"); if (tr) tr.setAttribute("data-editado","true"); }
+
+  function toggleQtdDiasInput(selectElement, qtdDatasSel){
+    const row = selectElement.closest("tr");
+    const input = row.querySelector(".qtd-dias");
+    const valor = selectElement.value;
+
+    if (["Desligado","Transferido"].includes(valor)){
+      if (input){
+        input.style.display = "none";
+        input.value = (valor === "Desligado" ? 31 : "");
+        input.readOnly = true;
+      }
+    } else if (STATUS_COM_QTD.includes(valor)){
+      if (qtdDatasSel === 1){
+        input.style.display = "inline";
+        input.style.width = "100%";
+        input.readOnly = false;
+        if(!input.value) input.value = "";
+      } else {
+        input.style.display = "none";
+        input.value = "";
+        input.readOnly = true;
+        if (!ALERT_QTD_ONCE){
+          alert("A edição da quantidade de dias só é permitida quando uma única data está selecionada.");
+          ALERT_QTD_ONCE = true;
+        }
+      }
+    } else {
+      input.style.display = "none";
+      input.value = "";
+      input.readOnly = false;
+    }
+  }
+
+  function registrarTodos(){
+    const selects = document.querySelectorAll("select.status-select");
+    const alteracoes = [];
+
+    selects.forEach(sel => {
+      const novoStatus = sel.value;
+      const original   = sel.getAttribute("data-original");
+      if (!novoStatus || novoStatus === original) return;
+
+      const row = sel.closest("tr");
+      const qtdInput = row.querySelector(".qtd-dias");
+      const motivoInput = row.nextElementSibling?.querySelector(".motivo-input");
+
+      alteracoes.push({
+        nome: sel.getAttribute("data-nome"),
+        turno: sel.getAttribute("data-turno"),
+        empresa: sel.getAttribute("data-empresa"),
+        processo: sel.getAttribute("data-processo"),
+        dataRef: sel.getAttribute("data-dataref"),
+        novoStatus: novoStatus,
+        qtdDias: (qtdInput && qtdInput.style.display !== "none" && qtdInput.value) ? qtdInput.value : "",
+        motivoDesligamento: motivoInput ? motivoInput.value.trim() : ""
+      });
+    });
+
+    if (alteracoes.length === 0){
+      alert("⚠️ Nenhuma alteração para salvar.");
+      return;
+    }
+
+    mostrarOverlay("Salvando alterações no histórico...");
+    google.script.run.withSuccessHandler(function(msg){
+      ocultarOverlay();
+      alert(msg || "Salvo.");
+      enviarNome();
+    }).withFailureHandler(function(err){
+      ocultarOverlay();
+      alert("Erro ao salvar: " + err.message);
+    }).salvarEdicoesHistorico(alteracoes);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <title>Controle ABS</title>
+  <style>
+      :root {
+        --color1: #f4f4f4;
+        --color2: #ffffff;
+        --color3: #6bc287;
+        --color4: #f4a261;
+        --color5: #0f2e2b;
+      }
+      h2{
+        color:var(--color4);
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: var(--color1);
+        margin: 0;
+        padding: 0;
+      }
+      header {
+        background-color: var(--color2);
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000;
+        box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+      }
+      .navbar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 80px;
+        padding: 0 20px;
+      }
+      .navbar-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: 1200px;
+        justify-content: space-between;
+      }
+      .navbar h1 {
+        margin: 0;
+        color: var(--color4);
+        font-size: 24px;
+      }
+      .nav {
+        display: flex;
+        gap: 10px;
+      }
+      button {
+        background-color: var(--color3);
+        color: var(--color2);
+        font-weight: bold;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 10px;
+      }
+      button:hover {
+        background-color: var(--color5);
+      }
+      main {
+        padding: 120px 20px 20px;
+      }
+      .content {
+        max-width: 90%;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: var(--color2);
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: left;
+      }
+      .form-row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      select {
+        padding: 10px;
+        border-radius: 10px;
+        border: 2px solid var(--color3);
+        background-color: #de900000; 
+      }
+      option{
+        color: #000000;
+      }
+      .selecionar {
+        background-color: var(--color3);
+        color: var(--color2);
+        font-weight: bold;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 10px;
+      }
+      #resultado {
+        margin-top: 20px;
+        text-align: left;
+      }
+      .tabela-scroll {
+        max-height: 400px;
+        overflow-y: auto;
+        margin-top: 10px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+      thead th {
+        position: sticky;
+        top: 0;
+        background-color: var(--color3);
+        color: white;
+        z-index: 1;
+      }
+      th, td {
+        padding: 8px;
+        border: 1px solid #ccc;
+        text-align: center;
+        font-size: 10px;
+      }
+      .status-select {
+        width: 100%;
+        border: none;
+      }
+      .botao-fixo {
+        background-color: var(--color3);
+        color: var(--color2);
+        font-weight: bold;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 10px;
+      }
+      .botoes-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding: 0 10px;
+      }
+      #ajuda-botao {
+        width: 40px;
+        height: 40px;
+        background-color: var(--color4);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 20px;
+        cursor: pointer;
+        position: relative;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      }
+      #ajuda-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 3000;
+        justify-content: center;
+        align-items: center;
+      }
+      .ajuda-conteudo {
+        background: white;
+        padding: 20px 30px;
+        border-radius: 10px;
+        max-width: 400px;
+        text-align: left;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      }
+      .ajuda-conteudo h3 {
+        margin-top: 0;
+        color: var(--color4);
+      }
+      .ajuda-conteudo strong {
+        color: var(--color4);
+      }
+      .ajuda-conteudo .presentee {
+        color: var(--color3);
+      }
+
+      .ajuda-conteudo button {
+        background-color: var(--color3);
+        color: var(--color2);
+        font-weight: bold;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 10px;
+        margin: 5px 0;
+      }
+      .ajuda-conteudo .fecharmodal {
+        background-color: var(--color3) !important;
+      }
+      .ajuda-conteudo .fecharmodal:hover {
+        background-color: var(--color4) !important;
+      }
+      .status-verde {
+        background-color: #6bc287;
+        color: white;
+        font-weight: bold;
+      }
+      .status-verde select{
+        color: white;
+        font-weight: bold;
+        border: none
+      }
+      .status-verde2 {
+        background-color: #274e13;
+        color: #d9ead3;
+        font-weight: bold;
+      }
+      .status-verde2 select{
+        color: #d9ead3;
+        font-weight: bold;
+        border: none
+      }
+      .status-laranja {
+        background-color: #fff2cc;
+        color: #783f04;
+        font-weight: bold;
+      }
+      .status-laranja select{
+        color: #783f04;
+        font-weight: bold;
+        border: none
+      }
+      .status-laranjaForte {
+        background-color: #783f04;
+        color: #fff2cc;
+        font-weight: bold;
+      }
+      .status-laranjaForte select{
+        color: #fff2cc;
+        font-weight: bold;
+        border: none
+      }
+      .status-vermelho {
+        background-color: #e76f51;
+        color: white;
+        font-weight: bold;
+      }
+      .status-vermelho select{
+        color: white;
+        font-weight: bold;
+        border: none
+      }
+      .status-roxo{
+        background-color: #be4ac9;
+        color: white;
+        font-weight: bold;
+      }
+      .status-roxo select{
+        color: white;
+        font-weight: bold;
+        border: none
+      }
+      .status-roxoFraco{
+        background-color: #d9d2e9;
+        color: #be4ac9;
+        font-weight: bold;
+      }
+      .status-roxoFraco select{
+        color: #be4ac9;
+        font-weight: bold;
+        border: none
+      }
+      .status-azul{
+        background-color: #c9daf8;
+        font-weight: bold;
+      }
+      .status-azul select{
+        color: #0c343d;
+        font-weight: bold;
+        border: none
+      }
+      .status-azul2{
+        background-color: #0c343d;
+        font-weight: bold;
+      }
+      .status-azul2 select{
+        color: #c9daf8;
+        font-weight: bold;
+        border: none
+      }
+      #logo{
+        width:50px;
+        height:50px;
+      }
+
+      .turma-a {
+        background-color: #fe5858; /* vermelho */
+        color: #fff;
+        font-weight: bold;
+      }
+      .turma-b {
+        background-color: #ffd965; /* laranja */
+        color: #fff;
+        font-weight: bold;
+      }
+      .turma-c {
+        background-color: #00ffff; /* ciano */
+        color: #000000;
+        font-weight: bold;
+      }
+      .turma-d {
+        background-color: #bcbdf0; /* roxo */
+        color: #fff;
+        font-weight: bold;
+      }
+      .turma-dom {
+        background-color: #cccccc; /* cinza */
+        color: #000000;
+        font-weight: bold;
+      }
+      .turma-sab {
+        background-color: #e6b8af; /* marom */
+        color: #000000;
+        font-weight: bold;
+      }
+      .turma-adm{
+        background-color: #434343; /* marom */
+        color: #fff;
+        font-weight: bold;
+      }
+      /* Adicione mais conforme necessário */
+      #loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 5000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .spinner {
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        background-color: #6bc287;
+        padding: 20px 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px #ffd965;
+      }
+      #loading-overlay2 {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 5000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .spinner2 {
+        color: black;
+        font-size: 20px;
+        font-weight: bold;
+        background-color: #ffd965;
+        padding: 20px 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px #6bc287;
+      }
+      #loading-text-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .versionCode{
+        color: #999999;
+        font-weight: bold;
+      }
+      .versionCode .versionCode2{
+        color: #f4a261;
+        font-weight: bold;
+      }
+      .nomes-checkbox-list {
+        display: flex;
+        flex-direction: column;
+        max-height: 150px;
+        overflow-y: auto;
+        border: 1px solid #6bc287;
+        border-radius: 8px;
+        padding: 10px;
+        min-width: 270px;
+        background: #fff;
+      }
+      .nomes-checkbox-list label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 2px 0;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .nomes-checkbox-list input[type="checkbox"] {
+        accent-color: #6bc287;
+      }
+      .multiselect-container {
+        position: relative;
+        min-width: 270px;
+      }
+      .multiselect-selected {
+        border: 2px solid #6bc287;
+        border-radius: 8px;
+        background: #fff;
+        padding: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width:320px;
+        justify-content: space-between;
+      }
+      #multiselect-badges span {
+        background: #6bc287;
+        color: #fff;
+        border-radius: 8px;
+        padding: 6px 8px;
+        margin-right: 5px;
+        font-size: 13px;
+      }
+      .multiselect-dropdown {
+        position: absolute;
+        width: 100%;
+        top: 100%;
+        left: 0;
+        background: #fff;
+        border: 2px solid #6bc287;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        overflow-y: auto;
+        z-index: 999;
+        box-shadow: 0 2px 8px #00000010;
+      }
+      .multiselect-dropdown label {
+        display: flex;
+        align-items: center;
+        padding: 8px 10px;
+        cursor: pointer;
+      }
+      .multiselect-dropdown label:hover {
+        background: #f4f4f4;
+      }
+      .arrow {
+        font-size: 13px;
+        margin-left: 5px;
+        color: #aaa;
+      }
+      /* Força as cores de texto para qualquer elemento com a classe de status */
+      .status-verde, .status-verde * { color: white !important; background-color: #6bc287 !important; }
+      .status-verde2, .status-verde2 * { color: #d9ead3 !important; background-color: #274e13 !important; }
+      .status-laranja, .status-laranja * { color: #783f04 !important; background-color: #fff2cc !important; }
+      .status-laranjaForte, .status-laranjaForte * { color: #fff2cc !important; background-color: #783f04 !important; }
+      .status-vermelho, .status-vermelho * { color: white !important; background-color: #e76f51 !important; }
+      .status-roxo, .status-roxo * { color: white !important; background-color: #be4ac9 !important; }
+      .status-roxoFraco, .status-roxoFraco * { color: #be4ac9 !important; background-color: #d9d2e9 !important; }
+      .status-azul, .status-azul * { color: #0c343d !important; background-color: #c9daf8 !important; }
+      .status-azul2, .status-azul2 * { color: #c9daf8 !important; background-color: #0c343d !important; }
+      .status-nao-definido, .status-nao-definido * {
+      background-color: #111 !important;
+      color: #fff !important;
+      border-color: #222 !important;
+    }
+</style>
+
+   
+</head>
+<body>
+  <header>
+    <div class="navbar">
+      <div class="navbar-content">
+        <img src="https://lh5.googleusercontent.com/proxy/OWOdTJ1zkkZ7YU0-dpOIK9TjofSs6nimeI7LfWgZJFC0Ru0n4LlZMiGMAiCkywPe1jTXPrLNB_Q9X09pVQb0YZZ3AOoM-EJ8POnVioajQuCP0EPLj7KIVJpCCA" id="logo"/>
+        <h1>Controle ABS</h1>
+        <div class="nav">
+          <button onclick="pageDmaisum()">Lançamentos Futuros</button>
+          <button onclick="pagehistorico()">Histórico</button>
+          <button onclick="pagevoltar_ao_site()">Voltar ao site</button>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="content">
+      <h2>Selecione o Team Leader</h2>
+      
+      <div id="ajuda-modal">
+          <div class="ajuda-conteudo">
+            <h3>Como funciona o sistema?</h3>
+            <p>Olá, Team Leader! Este sistema foi criado para facilitar e agilizar o processo de chamada da sua equipe.</p>
+            <p>Ao carregar os dados, o sistema exibirá apenas os colaboradores que não registraram o <strong>Clock-in</strong> ao passar na catraca.</p>
+            <p>Esses nomes devem ser justificados manualmente por você, selecionando o motivo da ausência.</p>
+            <p>Já os colaboradores que realizarem corretamente o <strong>Clock-in</strong> serão automaticamente registrados como <strong class="presentee">Presente</strong> sem necessidade de ação adicional.</p>
+            <p>Para entender melhor todas as funcionalidades da ferramenta, acesse o material explicativo completo abaixo:</p>
+
+            <button onclick="materialTutorial()">Ver material</button>
+            <button onclick="fecharModal()" class="fecharmodal">Fechar</button>
+          </div>
+        </div>
+      <div class="form-row">
+        <select id="turno">
+          <option disabled selected>Selecione o turno</option>
+          <option value="1º TURNO">1º TURNO</option>
+          <option value="2º TURNO">2º TURNO</option>
+          <option value="3º TURNO">3º TURNO</option>
+          <option value="4º TURNO">4º TURNO</option>
+          <option value="5º TURNO">5º TURNO</option>
+        </select>
+        <div id="nomes-multiselect" class="multiselect-container">
+          <div class="multiselect-selected" onclick="abrirFecharMultiselect()">
+            <span id="multiselect-placeholder">Selecione até 1 Team leader</span>
+            <span id="multiselect-badges"></span>
+            <span class="arrow">&#9662;</span>
+          </div>
+          <div id="multiselect-dropdown" class="multiselect-dropdown" style="display:none;"></div>
+        </div>
+        <button onclick="enviarNome()" class="selecionar">Carregar Equipe</button>
+      </div>
+      <div id="resumo-status" style="margin-bottom: 10px;"></div>
+      <div id="resultado">
+        <div class="tabela-scroll"></div>
+      </div>
+    </div>
+  </main>
+  <div id="loading-overlay" style="display: none;" onclick="fecharLoading(event)">
+    <div class="spinner" id="loading-text-container">
+      <span id="loading-text">Salvando, aguarde...</span>
+      <button id="btn-fechar-overlay" onclick="fecharOverlay()" style="display: none; margin-left: 20px; background-color: transparent; color: white; border: none; font-size: 20px; cursor: pointer;">✖</button>
+    </div>
+  </div>
+  <center><span class="versionCode">Versão 0.<span class="versionCode2">1</span>.5</span></center>
+    <script>
+function abrirFecharMultiselect() {
+  const drop = document.getElementById('multiselect-dropdown');
+  drop.style.display = drop.style.display === 'none' ? 'block' : 'none';
+}
+
+document.addEventListener('click', function(e) {
+  if (!document.getElementById('nomes-multiselect').contains(e.target)) {
+    document.getElementById('multiselect-dropdown').style.display = 'none';
+  }
+});
+
+
+document.addEventListener('click', function(e) {
+  if (!document.getElementById('nomes-multiselect').contains(e.target)) {
+    document.getElementById('multiselect-dropdown').style.display = 'none';
+  }
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.getElementById('multiselect-dropdown').style.display = 'none';
+  }
+});
+
+document.getElementById("turno").addEventListener("change", function () {
+  const turnoSelecionado = this.value;
+  const drop = document.getElementById("multiselect-dropdown");
+
+  // Mostra carregando no campo principal
+  document.getElementById('multiselect-placeholder').textContent = "Carregando nomes...";
+  document.getElementById('multiselect-placeholder').style.color = "#888";
+  document.getElementById('multiselect-badges').innerHTML = "";
+
+  drop.innerHTML = "<span style='color:#888;'>Carregando nomes...</span>";
+
+  google.script.run.withSuccessHandler(function (teamleaders) {
+    teamleaders.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
+    let html = "";
+    teamleaders.forEach((tl) => {
+      html += `<label>
+        <input type="checkbox" class="multicheck" value="${tl.nome}" onchange="atualizarSelecaoMultiselect(this)">
+        ${tl.nome}
+      </label>`;
+    });
+    drop.innerHTML = html;
+    drop.style.display = "none";
+    // Volta o placeholder ao normal
+    //document.getElementById('multiselect-placeholder').textContent = "Selecione até dois Team leaders";
+    document.getElementById('multiselect-placeholder').textContent = "Selecione até 1 Team leader";
+    document.getElementById('multiselect-placeholder').style.color = "";
+  }).obterTeamLeadersPorTurno(turnoSelecionado);
+});
+
+
+function atualizarSelecaoMultiselect(checkbox) {
+  const all = document.querySelectorAll('.multicheck:checked');
+  if (all.length > 1) {
+    checkbox.checked = false;
+    alert("Você pode selecionar no máximo 1 Team Leader.");
+    return;
+  }
+  const badges = Array.from(all).map(cb => `<span>${cb.value}</span>`).join('');
+  document.getElementById('multiselect-badges').innerHTML = badges;
+  document.getElementById('multiselect-placeholder').style.display = all.length ? 'none' : '';
+
+  if (all.length === 1) {
+    document.getElementById('multiselect-dropdown').style.display = 'none';
+  }
+}
+
+function getNomesSelecionados() {
+  return Array.from(document.querySelectorAll('.multicheck:checked')).map(cb => cb.value);
+}
+
+// Remove container existente para não duplicar (boa prática)
+let botoesContainer = document.getElementById('botoes-container');
+if (botoesContainer) botoesContainer.remove();
+
+// Cria o container dos botões
+botoesContainer = document.createElement('div');
+botoesContainer.id = 'botoes-container';
+botoesContainer.className = 'botoes-container';
+
+// Botão de Ajuda
+const botaoAjuda = document.createElement('div');
+botaoAjuda.id = 'ajuda-botao';
+botaoAjuda.title = "Clique aqui para entender as siglas do Status_ABS";
+botaoAjuda.textContent = '?';
+botaoAjuda.onclick = () => document.getElementById("ajuda-modal").style.display = "flex";
+botoesContainer.appendChild(botaoAjuda);
+
+
+// No início
+let botaoRegistrar = document.getElementById("botao-registrar");
+if (!botaoRegistrar) {
+  botaoRegistrar = document.createElement("button");
+  botaoRegistrar.textContent = "Registrar Todos";
+  botaoRegistrar.className = "botao-fixo";
+  botaoRegistrar.id = "botao-registrar";
+  botaoRegistrar.onclick = registrarTodos;
+  botaoRegistrar.style.display = "none";
+  botoesContainer.appendChild(botaoRegistrar);
+}
+
+// Adiciona o container logo após o resultado (ou onde preferir)
+document.getElementById("resultado").after(botoesContainer);
+
+
+    function fecharOverlay() {
+      document.getElementById("loading-overlay").style.display = "none";
+    }
+
+    function fecharLoading(event) {
+      if (event.target.id === "loading-overlay") {
+        fecharOverlay();
+      }
+    }
+
+function enviarNome() {
+  const nomesSelecionados = getNomesSelecionados();
+  const turnoSelecionado = document.getElementById("turno").value;
+
+  if (nomesSelecionados.length === 0) {
+    alert("Por favor, selecione pelo menos um Team Leader.");
+    return;
+  }
+  if (nomesSelecionados.length > 2) {
+    alert("Selecione no máximo 2 Team Leaders.");
+    return;
+  }
+
+  // Valida apenas o primeiro TL selecionado:
+  google.script.run.withSuccessHandler(function(mensagemAviso) {
+    if (mensagemAviso) {
+      // Exibe aviso e interrompe fluxo
+      const botao = document.getElementById("botao-registrar");
+      if (botao) botao.style.display = "none";
+      document.getElementById("resultado").innerHTML = `
+        <div style="background: #fceabb; color: #783f04; border-radius:8px; padding:16px; margin: 20px 0;">
+          <center>⚠️ <b>Atenção, já existe dados da sua equipe registrados nesta data!</b> ⚠️<br><br>
+          <a href="https://docs.google.com/spreadsheets/d/1ugAXKQWod5Vk7DSulEo53H-Wwox_B4bRaQZjA-TgO4U/edit?gid=0#gid=0" target="_blank" style="text-decoration: none;"class="selecionar">
+            ➡️ Visualizar dados salvos na planilha
+          </a></center>
+        </div>
+      `;
+      return;
+    }
+
+    // Se não houver aviso, busca e exibe os dados normalmente
+    document.getElementById("resultado").innerHTML = `<div class="tabela-scroll"></div>`;
+    document.getElementById("loading-text").textContent = "Carregando equipe...";
+    document.getElementById("loading-overlay").style.display = "flex";
+
+    google.script.run.withSuccessHandler(function(dados) {
+      document.getElementById("loading-overlay").style.display = "none";
+      if (!dados || dados.length === 0) {
+        alert("Nenhum dado encontrado para estes Team Leaders.");
+        document.getElementById("botao-registrar").style.display = "none";
+        return;
+      }
+
+      // ORDENE POR TEAM_LEADER para manter agrupado visualmente
+      dados.sort((a, b) => (a.TEAM_LEADER > b.TEAM_LEADER) ? 1 : -1);
+
+      let html = `<table>
+        <thead>
+          <tr>
+          <th>AREA_HEAD</th>
+          <th>IDGROOT</th> 
+          <th>LDAP</th> 
+          <th>COLABORADOR</th>
+            <th>TURNO</th>
+            <th>ESCALA</th>
+            <th>TURMA_ESCALA</th>
+            <th>EMPRESA</th>
+            <th>PROCESSO</th>
+            <th>STATUS_HC</th>
+            <th>STATUS</th>
+            <th style="display:none;">QTD_DIAS</th>
+          </tr>
+        </thead>
+        <tbody>
+      `;
+// Adicione logo acima do forEach:
+const mostrarHeaderTL = nomesSelecionados.length > 1; // true se mais de um TL
+
+let ultimoTL = null;
+dados.forEach((linha, index) => {
+  // Só mostra se for mais de um líder
+  if (mostrarHeaderTL && linha.TEAM_LEADER !== ultimoTL) {
+    html += `<tr style="background:#ff6105; color:black;"><td colspan="13"><b>TEAM LEADER: ${linha.TEAM_LEADER}</b></td></tr>`;
+    ultimoTL = linha.TEAM_LEADER;
+  }
+    let classStatusAbs = "";
+    let classStatusHC = "";
+
+  // Cálculo dos status
+  let statusAbs = linha.STATUS_abs || "";
+  const statusHC = (linha.STATUS_HC || "").toUpperCase();
+
+  // Preenche status_abs se necessário
+  if (!statusAbs && statusHC !== "ATIVO") {
+    const mapaStatusHC = {
+      "DESLIGADO": "Desligado",
+      "TRANSFERIDO": "Transferido",
+      "AFASTADA GRAVIDEZ": "Afastamento",
+      "AFASTADO": "Afastamento",
+      "AFASTADO INSS": "Afastamento",
+      "TRANSFERÊNCIA MELICIDADE": "Transferido",
+      "TRANSFERÊNCIA BRSP11": "Transferido",
+      "TRANSFERÊNCIA BRSP04": "Transferido",
+      "TRANSFERÊNCIA BRSP02": "Transferido",
+      "TRANSFERÊNCIA BRSP15": "Transferido",
+      "TRANSFERÊNCIA SORTATION": "Transferido",
+      "TRANSFERÊNCIA BRRC01": "Transferido",
+      "TRANSFERÊNCIA BRSP14": "Transferido",
+      "TRANSFERÊNCIA BRSP06": "Transferido"
+    };
+    statusAbs = mapaStatusHC[statusHC] || "";
+  }
+
+  // Classes ABS
+  if (["Presente","Treinamento-Int", "Treinamento-REP-III","Treinamento-Ext"].includes(statusAbs)) classStatusAbs = "status-verde";
+  else if (statusAbs === "Presenca-HE") classStatusAbs = "status-verde2";
+  else if (["Afastamento","Atestado","Declaracao-de-Horas"].includes(statusAbs)) classStatusAbs = "status-laranja";
+  else if (["Licenca","Transferido"].includes(statusAbs)) classStatusAbs = "status-laranjaForte";
+  else if (statusAbs === "Banco-de-Horas") classStatusAbs = "status-roxo";
+  else if (["Sinergia SP014","Sinergia CX","Sinergia INB","Sinergia LOS","Sinergia MG01","Sinergia MWH","Sinergia OUT","Sinergia QUA","Sinergia RC01","Sinergia RET","Sinergia SP011","Sinergia SP02","Sinergia SP03","Sinergia SP04","Sinergia SP05","Sinergia SP06","Sinergia SP09","Sinergia INV","Sinergia RET","Sinergia QUA","Sinergia SVC","Sinergia RC-SP10","Sinergia Sortation","Sinergia Insumo"].includes(statusAbs)) classStatusAbs = "status-roxoFraco";
+  else if (["Folga-Escala", "OWNboarding"].includes(statusAbs)) classStatusAbs = "status-azul";
+  else if (statusAbs === "Ferias") classStatusAbs = "status-azul2";
+  //else if (statusAbs === "Desligado") classStatusAbs = "status-vermelho";
+  else if (["Desligado", "Falta"].includes(statusAbs)) classStatusAbs = "status-vermelho";
+  // Classes HC
+  if (statusHC === "DESLIGADO") classStatusHC = "status-vermelho";
+  else if (["AFASTADO", "AFASTADA GRAVIDEZ"].includes(statusHC)) classStatusHC = "status-laranja";
+  else if (statusHC === "ATIVO") classStatusHC = "status-verde";
+
+      // Aqui, adicione o atributo data-teamleader:
+      html += `<tr data-teamleader="${linha.TEAM_LEADER}">
+        <td>${linha.AREA_HEAD}</td>
+        <td>${linha.IDGROOT}</td>
+        <td>${linha.LDAP}</td>
+        <td>${linha.COLABORADOR}</td>
+        <td>${linha.TURNO}</td>
+        <td>${linha.ESCALA}</td>
+        <td class="turma-${(linha.TURMA_ESCALA || "").toLowerCase()}">${linha.TURMA_ESCALA}</td>
+        <td>${linha.EMPRESA}</td>
+        <td>${linha.PROCESSO}</td>
+        <td class="${classStatusHC}">${linha.STATUS_HC}</td>
+        <td class="${classStatusAbs}">
+          ${statusHC === "DESLIGADO" || statusAbs === "Banco-de-Horas" ? statusAbs : `
+          <select class="status-select" data-index="${index}" onchange="toggleQtdDiasInput(this)">
+          <option value="">Selecione</option>
+          ${[
+            "Folga-Escala","Falta","Atestado","Atestado-Acd-Trab","Decl-Medica","Declaracao-de-Horas","Desligado","Presente","Presenca-HE","Banco-de-Horas","Transferido","Transferido-Area","Treinamento-Ext","Treinamento-Int","Treinamento-REP-III","Ferias","Fretado","Afastamento","Afastamento-Acd-Trab","Licenca","Sinergia SP014","Sinergia CX","Sinergia INB","Sinergia LOS","Sinergia MG01","Sinergia MWH","Sinergia OUT","Sinergia QUA","Sinergia RC01","Sinergia RET","Sinergia SP011","Sinergia SP02","Sinergia SP03","Sinergia SP04","Sinergia SP05","Sinergia SP06","Sinergia SP09","Sinergia INV","Sinergia RET","Sinergia QUA","Sinergia SVC","Sinergia RC-SP10","Sinergia Sortation","Sinergia Insumo","Atividade-Externa","OWNboarding","Suspensao"].map(opt => `<option value="${opt}" ${statusAbs === opt ? "selected" : ""}>${opt}</option>`).join("")}
+        </select>
+          `}
+        </td>
+        <td>${
+          ["Transferido","OWNboarding","Atestado","Banco-de-Horas","Afastamento","Licenca","Atestado-Acd-Trab","Ferias", "Treinamento-Ext","Treinamento-Int","Treinamento-REP-III","Ferias","Fretado","Afastamento","Afastamento-Acd-Trab","Licenca","Sinergia SP014","Sinergia CX","Sinergia INB","Sinergia LOS","Sinergia MG01","Sinergia MWH","Sinergia OUT","Sinergia QUA","Sinergia RC01","Sinergia RET","Sinergia SP011","Sinergia SP02","Sinergia SP03","Sinergia SP04","Sinergia SP05","Sinergia SP06","Sinergia SP09","Sinergia INV","Sinergia RET","Sinergia QUA","Sinergia SVC","Sinergia RC-SP10","Sinergia Sortation","Sinergia Insumo","Atividade-Externa","Suspensao"].includes(linha.STATUS_abs)
+            ? `<span>${linha.DIAS_RESTANTES} dia(s)</span>`
+            : `<input type="number" class="qtd-dias" style="display:none;width:100%;" min="1" />`
+        }</td>
+      </tr>
+      <tr class="campo-motivo-desligamento" style="display: none;">
+        <td colspan="12">
+          <input type="text" class="motivo-input" placeholder="Informe o motivo e a data" style="width: 100%;" />
+        </td>
+      </tr>`;
+      
+    });
+
+    html += "</tbody></table>";
+    document.querySelector(".tabela-scroll").innerHTML = html;
+    document.getElementById("botao-registrar").style.display = "";
+
+    // Adiciona comportamento para mostrar/esconder campo de motivo
+      document.querySelectorAll(".status-select").forEach(select => {
+        aplicarCorSelect(select); // cor inicial
+        select.addEventListener("change", function () {
+          aplicarCorSelect(this);
+          const linha = this.closest("tr");
+          const motivoRow = linha.nextElementSibling;
+
+          if (
+            this.value === "Desligado" ||
+            this.value === "Transferido" ||
+            this.value === "Afastamento" ||
+            this.value === "Afastamento-Acd-Trab" ||
+            this.value === "Licenca"
+          ) {
+            motivoRow.style.display = "";
+          } else {
+            motivoRow.style.display = "none";
+          }
+          atualizarResumoStatus();
+        });
+      });
+      verificarColunaQtdDias();
+      atualizarResumoStatus();
+    }).responderNomeMulti(nomesSelecionados, turnoSelecionado);
+  }).verificarRegistroHoje(nomesSelecionados[0], turnoSelecionado); // <-- corrigido aqui!
+}
+function toggleQtdDiasInput(selectElement) {
+    const row = selectElement.closest("tr");
+    const input = row.querySelector(".qtd-dias");
+    const valor = selectElement.value;
+
+    if (["OWNboarding","Atestado","Banco-de-Horas","Afastamento","Licenca","Atestado-Acd-Trab","Ferias", "Treinamento-Ext","Treinamento-Int","Treinamento-REP-III","Ferias","Afastamento","Afastamento-Acd-Trab","Licenca","Sinergia SP014","Sinergia CX","Sinergia INB","Sinergia LOS","Sinergia MG01","Sinergia MWH","Sinergia OUT","Sinergia QUA","Sinergia RC01","Sinergia RET","Sinergia SP011","Sinergia SP02","Sinergia SP03","Sinergia SP04","Sinergia SP05","Sinergia SP06","Sinergia SP09","Sinergia INV","Sinergia RET","Sinergia QUA","Sinergia SVC","Sinergia RC-SP10","Sinergia Sortation","Sinergia Insumo","Atividade-Externa","Suspensao"].includes(valor)) {
+        input.style.display = "inline";
+        input.style.width = "100%";
+        input.value = ""; // permite digitar
+    } else if (valor === "Desligado" || valor === "Transferido") {
+        input.style.display = "none";
+        input.value = "31";
+        input.readOnly = true;
+    }else {
+        input.style.display = "none";
+        input.value = "";
+        input.readOnly = false;
+    }
+    verificarColunaQtdDias();
+  }
+
+function verificarColunaQtdDias() {
+  const ths = document.querySelectorAll("th");
+  if (!ths[11]) return; // Segurança para não quebrar se não existir coluna
+
+  let mostrar = false;
+  document.querySelectorAll(".qtd-dias").forEach(input => {
+    if (input.style.display === "inline") mostrar = true;
+  });
+
+  ths[11].style.display = mostrar ? "" : "none";
+
+  // Para cada linha, controle também a célula TD correspondente:
+  document.querySelectorAll("tbody tr").forEach(tr => {
+    const td = tr.children[11];
+    if (td) td.style.display = mostrar ? "" : "none";
+  });
+}
+
+
+function registrarTodos() {
+  const nomesSelecionados = getNomesSelecionados();
+  const turnoSelecionado = document.getElementById("turno").value;
+  const versao = document.querySelector('.versionCode')?.textContent.trim() || '';
+
+  if (!nomesSelecionados.length) {
+    alert("Nenhum Team Leader selecionado!");
+    return;
+  }
+
+  // Coleta todas as linhas da tabela exibida
+  const selects = document.querySelectorAll("select.status-select");
+  let todasLinhas = [];
+  let faltandoStatus = []; // <--- Novo array para os faltantes
+
+  selects.forEach(select => {
+    const row = select.closest("tr");
+    const teamLeader = row.getAttribute('data-teamleader');
+    const cells = row.querySelectorAll("td");
+    const qtdInput = row.querySelector(".qtd-dias");
+    const status = select.value && select.value.trim() ? select.value.trim() : "(Não Definido)";
+
+    if (status === "(Não Definido)") {
+      // Pega o nome do colaborador para mostrar na mensagem
+      const nomeColab = cells[3]?.textContent.trim() || "Colaborador desconhecido";
+      faltandoStatus.push(nomeColab);
+    }
+
+    let qtdDias = 0;
+    if (status === "Desligado" || status === "Transferido") {
+      qtdDias = 31;
+    } else if (qtdInput && qtdInput.value) {
+      qtdDias = parseInt(qtdInput.value);
+    }
+
+    const motivoInput = row.nextElementSibling?.querySelector(".motivo-input");
+    const motivoDesligamento = motivoInput ? motivoInput.value.trim() : "";
+
+    todasLinhas.push({
+      TEAM_LEADER: teamLeader,
+      AREA_HEAD: cells[0].textContent.trim(),
+      IDGROOT: cells[1].textContent.trim(),
+      LDAP: cells[2].textContent.trim(),
+      COLABORADOR: cells[3].textContent.trim(),
+      TURNO: cells[4].textContent.trim(),
+      ESCALA: cells[5].textContent.trim(),
+      TURMA_ESCALA: cells[6].textContent.trim(),
+      EMPRESA: cells[7].textContent.trim(),
+      PROCESSO: cells[8].textContent.trim(),
+      STATUS_HC: cells[9].textContent.trim(),
+      STATUS_abs: status,
+      QTD_DIAS: qtdDias,
+      MOTIVO_DESLIGAMENTO: motivoDesligamento,
+      VERSAO: versao
+    });
+  });
+
+  // **NOVA LÓGICA**: Se houver qualquer (Não Definido), impedir envio
+  if (faltandoStatus.length > 0) {
+    alert(
+      "Os seguintes colaboradores ainda estão sem status definido:\n\n" +
+      faltandoStatus.join("\n") +
+      "\n\nPor favor, selecione um status para todos antes de registrar!"
+    );
+    return;
+  }
+
+  // --- Continua fluxo normalmente ---
+  let enviados = 0;
+  let totalTLs = nomesSelecionados.length;
+  let mensagensTL = [];
+
+  nomesSelecionados.forEach(nomeTL => {
+    const linhasDoTL = todasLinhas.filter(linha => linha.TEAM_LEADER === nomeTL);
+
+    if (linhasDoTL.length > 0) {
+      document.getElementById("loading-text").textContent = `Salvando registros do TL: ${nomeTL}`;
+      document.getElementById("loading-overlay").style.display = "flex";
+
+      google.script.run
+        .withSuccessHandler(function(mensagem) {
+          enviados++;
+          mensagensTL.push(`
+            <div style="background: #d4edda; color: #155724; border-radius:8px; padding:16px; margin: 20px 0;">
+              <center>✅ <b>Registros do TL <span style="color:#fffff">${nomeTL}</span> salvos com sucesso!</b><br><br>
+              <a href="" font-weight:bold;"></a></center>
+            </div>
+          `);
+
+          if (enviados === totalTLs) {
+            document.getElementById("resultado").innerHTML = mensagensTL.join('');
+            document.getElementById("loading-overlay").style.display = "none";
+            const botao = document.getElementById("botao-registrar");
+            if (botao) botao.style.display = "none";
+          }
+        })
+        .withFailureHandler(function(erro) {
+          alert(`Erro ao salvar de ${nomeTL}: ` + erro.message);
+          document.getElementById("loading-overlay").style.display = "none";
+        })
+        .registrarPresenca(nomeTL, linhasDoTL, versao, turnoSelecionado);
+    }
+  });
+}
+
+function atualizarResumoStatus() {
+  const statusList = Array.from(document.querySelectorAll('select.status-select'))
+    .filter(sel => sel.closest('tr').style.display !== "none")
+    .map(sel => sel.value && sel.value.trim() ? sel.value.trim() : "(Não Definido)");
+
+  const contagem = {};
+  statusList.forEach(status => {
+    contagem[status] = (contagem[status] || 0) + 1;
+  });
+
+  const corMap = {
+    "Presente": "status-verde",
+    "Treinamento-Int": "status-verde",
+    "Treinamento-REP-III": "status-verde",
+    "Treinamento-Ext": "status-verde",
+    "Presenca-HE": "status-verde2",
+    "Afastamento": "status-laranja",
+    "Atestado": "status-laranja",
+    "Declaracao-de-Horas": "status-laranja",
+    "Licenca": "status-laranjaForte",
+    "Transferido": "status-laranjaForte",
+    "Banco-de-Horas": "status-roxo",
+    "Sinergia SP014":"status-roxoFraco",
+    "Sinergia CX":"status-roxoFraco",
+    "Sinergia INB":"status-roxoFraco",
+    "Sinergia LOS":"status-roxoFraco",
+    "Sinergia MG01":"status-roxoFraco",
+    "Sinergia MWH":"status-roxoFraco",
+    "Sinergia OUT":"status-roxoFraco",
+    "Sinergia QUA":"status-roxoFraco",
+    "Sinergia RC01":"status-roxoFraco",
+    "Sinergia RET":"status-roxoFraco",
+    "Sinergia SP011":"status-roxoFraco",
+    "Sinergia SP02":"status-roxoFraco",
+    "Sinergia SP03":"status-roxoFraco",
+    "Sinergia SP04":"status-roxoFraco",
+    "Sinergia SP05":"status-roxoFraco",
+    "Sinergia SP06":"status-roxoFraco",
+    "Sinergia SP09":"status-roxoFraco",
+    "Sinergia INV":"status-roxoFraco",
+    "Sinergia RET":"status-roxoFraco",
+    "Sinergia QUA":"status-roxoFraco",
+    "Sinergia SVC":"status-roxoFraco",
+    "Sinergia RC-SP10":"status-roxoFraco",
+    "Sinergia Sortation":"status-roxoFraco",
+    "Sinergia Insumo":"status-roxoFraco",
+    "Folga-Escala": "status-azul",
+    "OWNboarding": "status-azul",
+    "Ferias": "status-azul2",
+    "Desligado": "status-vermelho",
+    "Falta": "status-vermelho",
+    "(Não Definido)": "status-nao-definido"
+  };
+
+  // Captura a cor real do .versionCode2
+  const spanRef = document.querySelector('.versionCode2');
+  let corTexto = '';
+  if (spanRef) {
+    corTexto = getComputedStyle(spanRef).color;
+  }
+
+  // Aplica a cor capturada no span do total
+  let html = `<b>Total de pessoas: <span class="versionCode2" style="color:${corTexto};">${statusList.length}</span></b><br>`;
+
+  html += '<div style="display:flex; flex-wrap:wrap; gap: 10px; margin-top:6px; background-color:#f4f4f4; padding:8px; border-radius:10px;">';
+  Object.entries(contagem)
+    .sort((a, b) => b[1] - a[1])
+    .forEach(([status, qtd]) => {
+      const classe = corMap[status] || '';
+      html += `<span class="${classe}" style="border-radius:8px; padding:4px 12px; font-weight:bold; border:1px solid #b5b5b5">${status}: ${qtd}</span>`;
+    });
+  html += '</div>';
+
+  document.getElementById('resumo-status').innerHTML = html;
+}
+
+
+
+    function fecharModal() {
+      document.getElementById("ajuda-modal").style.display = "none";
+    }
+    function pagehistorico() {
+      window.open("https://script.google.com/a/macros/mercadolivre.com/s/AKfycbwg_34QF09Vy7bjDIzvx2Sy2ckstbSr-dneAVRCqznJGVxPrN4wbnHXMzCNq4VV4EY/exec", "_blank");
+    }
+    function pageDmaisum(){
+      window.open("https://script.google.com/a/macros/mercadolivre.com/s/AKfycbxtQy2EakWU8AcBBjRJLaqV5K6ZEs6B_zLAZU_JXk1nCVjXg9fVMNF-4pfmnGywMX0LXw/exec", "_blank");
+    }
+    function pagevoltar_ao_site(){
+      window.open("https://sites.google.com/mercadolivre.com/idea-sp10/controles-gerais?authuser=0", "_blank");
+    }
+    function materialTutorial(){
+      window.open("https://docs.google.com/presentation/d/1-C4QuPmK5vGeUaBPHN9HtPO8xJ9B_eoI1NN3Enq4mnE/edit?usp=sharing", "_blank");
+    }
+    function carregarPagina(pagina) {
+    google.script.run.withSuccessHandler(function(html) {
+      document.getElementById('conteudo').innerHTML = html;
+    }).incluirPagina(pagina);
+  }
+  function aplicarCorSelect(select) {
+  // Remove todas as classes de cor já existentes
+  select.classList.remove(
+    'status-verde','status-verde2','status-laranja','status-laranjaForte','status-vermelho',
+    'status-roxo','status-roxoFraco','status-azul','status-azul2'
+  );
+      // Mapeia o valor para a classe correta
+      const corMap = {
+        "Presente": "status-verde",
+        "Treinamento-Int": "status-verde",
+        "Treinamento-REP-III": "status-verde",
+        "Treinamento-Ext": "status-verde",
+        "Presenca-HE": "status-verde2",
+        "Afastamento": "status-laranja",
+        "Atestado": "status-laranja",
+        "Declaracao-de-Horas": "status-laranja",
+        "Licenca": "status-laranjaForte",
+        "Transferido": "status-laranjaForte",
+        "Banco-de-Horas": "status-roxo",
+        "Sinergia SP014":"status-roxoFraco",
+        "Sinergia CX":"status-roxoFraco",
+        "Sinergia INB":"status-roxoFraco",
+        "Sinergia LOS":"status-roxoFraco",
+        "Sinergia MG01":"status-roxoFraco",
+        "Sinergia MWH":"status-roxoFraco",
+        "Sinergia OUT":"status-roxoFraco",
+        "Sinergia QUA":"status-roxoFraco",
+        "Sinergia RC01":"status-roxoFraco",
+        "Sinergia RET":"status-roxoFraco",
+        "Sinergia SP011":"status-roxoFraco",
+        "Sinergia SP02":"status-roxoFraco",
+        "Sinergia SP03":"status-roxoFraco",
+        "Sinergia SP04":"status-roxoFraco",
+        "Sinergia SP05":"status-roxoFraco",
+        "Sinergia SP06":"status-roxoFraco",
+        "Sinergia SP09":"status-roxoFraco",
+        "Sinergia INV":"status-roxoFraco",
+        "Sinergia RET":"status-roxoFraco",
+        "Sinergia QUA":"status-roxoFraco",
+        "Sinergia SVC":"status-roxoFraco",
+        "Sinergia RC-SP10":"status-roxoFraco",
+        "Sinergia Sortation":"status-roxoFraco",
+        "Sinergia Insumo":"status-roxoFraco",
+        "Folga-Escala": "status-azul",
+        "OWNboarding": "status-azul",
+        "Ferias": "status-azul2",
+        "Desligado": "status-vermelho",
+        "Falta": "status-vermelho"
+      };
+      const novaClasse = corMap[select.value];
+      if (novaClasse) select.classList.add(novaClasse);
+    }
+  </script>
+</body>
+</html>

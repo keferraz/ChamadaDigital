@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <title>Lançamento Futuros</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Flatpickr -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
+
+  <style>
+    :root {
+      --color1: #f4f4f4;
+      --color2: #ffffff;
+      --color3: #6bc287;
+      --color4: #f4a261;
+      --color5: #0f2e2b;
+    }
+    h2{ color:var(--color4); }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--color1);
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: var(--color2);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+    }
+    .navbar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 80px;
+      padding: 0 20px;
+    }
+    .navbar-content {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 1200px;
+      justify-content: space-between;
+    }
+    .navbar h1 {
+      margin: 0;
+      color: var(--color4);
+      font-size: 24px;
+    }
+    .nav { display: flex; gap: 10px; }
+    button {
+      background-color: var(--color3);
+      color: var(--color2);
+      font-weight: bold;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+    button:hover { background-color: var(--color5); }
+    main { padding: 120px 20px 20px; }
+    .content {
+      max-width: 90%;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: var(--color2);
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: left;
+    }
+    .form-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    select {
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid var(--color3);
+      background-color: #de900000;
+    }
+    option{ color: #000000; }
+    .selecionar {
+      background-color: var(--color3);
+      color: var(--color2);
+      font-weight: bold;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+    #resultado { margin-top: 20px; text-align: left; }
+    .tabela-scroll { max-height: 400px; overflow-y: auto; margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    thead th { position: sticky; top: 0; background-color: var(--color3); color: white; z-index: 1; }
+    th, td { padding: 8px; border: 1px solid #ccc; text-align: center; font-size: 10px; }
+    .status-select { width: 100%; border: none; }
+
+    /* Paleta usada pelo JS */
+    .status-verde { background-color: #6bc287; color: white; font-weight: bold; }
+    .status-verde select{ color: white; font-weight: bold; border: none }
+    .status-verde2 { background-color: #274e13; color: #d9ead3; font-weight: bold; }
+    .status-verde2 select{ color: #d9ead3; font-weight: bold; border: none }
+
+    .status-laranja { background-color: #f4a261; color: white; font-weight: bold; }
+    .status-laranja select{ color: white; font-weight: bold; border: none }
+    .status-laranjaForte { background-color: #783f04; color: #fff2cc; font-weight: bold; }
+    .status-laranjaForte select { color: #fff2cc; font-weight: bold; border: none }
+
+    .status-vermelho { background-color: #e76f51; color: white; font-weight: bold; }
+    .status-vermelho select{ color: white; font-weight: bold; border: none }
+
+    .status-roxo { background-color: #be4ac9; color: white; font-weight: bold; }
+    .status-roxo select{ color: white; font-weight: bold; border: none }
+    .status-roxoFraco { background-color: #d9d2e9; color: #be4ac9; font-weight: bold; }
+    .status-roxoFraco select { color: #be4ac9; font-weight: bold; border: none }
+
+    .status-azul { background-color: #c9daf8; font-weight: bold; }
+    .status-azul select { color: #0c343d; font-weight: bold; border: none }
+    .status-azul2 { background-color: #0c343d; font-weight: bold; }
+    .status-azul2 select { color: #c9daf8; font-weight: bold; border: none }
+
+    #logo{ width:50px; height:50px; }
+
+    .turma-a { background-color: #fe5858; color: #fff; font-weight: bold; }
+    .turma-b { background-color: #ffd965; color: #fff; font-weight: bold; }
+    .turma-c { background-color: #00ffff; color: #000; font-weight: bold; }
+    .turma-d { background-color: #bcbdf0; color: #fff; font-weight: bold; }
+    .turma-dom { background-color: #cccccc; color: #000; font-weight: bold; }
+    .turma-sab { background-color: #e6b8af; color: #000; font-weight: bold; }
+    .turma-adm{ background-color: #434343; color: #fff; font-weight: bold; }
+
+    .versionCode{ color: #999999; font-weight: bold; }
+    .versionCode .versionCode2{ color: #f4a261; font-weight: bold; }
+
+    .botoes-container {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 20px; padding: 0 10px;
+    }
+    #ajuda-botao {
+      width: 40px; height: 40px; background-color: var(--color4); color: white;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 20px; cursor: pointer; position: relative;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+    #ajuda-modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5);
+      z-index: 3000; justify-content: center; align-items: center;
+    }
+    .ajuda-conteudo {
+      background: white; padding: 20px 30px; border-radius: 10px; max-width: 400px;
+      text-align: left; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    .ajuda-conteudo h3 { margin-top: 0; color: var(--color4); }
+    .ajuda-conteudo strong { color: var(--color4); }
+    .ajuda-conteudo .presentee { color: var(--color3); }
+    .ajuda-conteudo button {
+      background-color: var(--color3); color: var(--color2); font-weight: bold;
+      border: none; padding: 10px 15px; cursor: pointer; border-radius: 10px; margin: 5px 0;
+    }
+    .ajuda-conteudo .fecharmodal { background-color: var(--color3) !important; }
+    .ajuda-conteudo .fecharmodal:hover { background-color: var(--color4) !important; }
+  </style>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Flatpickr: só hoje/futuro
+      flatpickr("#datasSelecionadas", {
+        mode: "multiple",
+        dateFormat: "d/m/Y",
+        locale: "pt",
+        minDate: "today",
+        onChange: function(selectedDates, _, instance) {
+          const today = new Date(); today.setHours(0,0,0,0);
+          const filtradas = selectedDates.filter(d => {
+            const dd = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            return dd >= today;
+          });
+          if (filtradas.length !== selectedDates.length) {
+            instance.setDate(filtradas, true);
+            alert("Só é permitido selecionar hoje ou datas futuras.");
+          }
+        }
+      });
+
+      // Carrega Team Leaders
+      google.script.run.withSuccessHandler(function (teamleaders) {
+        const select = document.getElementById("nome");
+        if (select) {
+          teamleaders.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
+          teamleaders.forEach(function (tl) {
+            const option = document.createElement("option");
+            option.value = tl.nome;
+            option.text = tl.nome;
+            select.appendChild(option);
+          });
+        }
+      }).obterTeamLeaders();
+
+      // Cria container de botões + ajuda
+      const container = document.createElement("div");
+      container.id = "botoes-container";
+      container.className = "botoes-container";
+      const botaoAjuda = document.createElement("div");
+      botaoAjuda.id = "ajuda-botao";
+      botaoAjuda.textContent = "?";
+      botaoAjuda.title = "Clique aqui para entender as siglas do Status_ABS";
+      botaoAjuda.onclick = () => document.getElementById("ajuda-modal").style.display = "flex";
+      container.appendChild(botaoAjuda);
+      document.getElementById("resultado").after(container);
+    });
+
+    function marcarEditado(element) {
+      const tr = element.closest("tr");
+      if (tr) tr.setAttribute("data-editado", "true");
+    }
+
+    function enviarNome() {
+      const nomeSelecionado = document.getElementById("nome").value;
+      if (!nomeSelecionado) {
+        alert("Por favor, selecione um Team Leader.");
+        return;
+      }
+
+      google.script.run.withSuccessHandler(function (dados) {
+        if (!dados || dados.length === 0) {
+          alert("Nenhum dado encontrado para este Team Leader.");
+          return;
+        }
+
+        let html = "<table><thead><tr><th>AREA_HEAD</th><th>IDGROOT</th><th>LDAP</th><th>COLABORADOR</th><th>TURNO</th><th>ESCALA</th><th>TURMA_ESCALA</th><th>EMPRESA</th><th>PROCESSO</th><th>STATUS_HC</th><th>STATUS</th><th>QTD_DIAS</th></tr></thead><tbody>";
+
+        dados.forEach((linha, index) => {
+          let statusAbs = linha.STATUS_abs || "";
+          const statusHC = (linha.STATUS_HC || "").toUpperCase();
+
+          // Preencher status_abs por HC quando pertinente
+          if (!statusAbs && statusHC !== "ATIVO") {
+            const mapaStatusHC = {
+              "DESLIGADO": "Desligado",
+              "TRANSFERIDO": "Transferido",
+              "AFASTADA GRAVIDEZ": "Afastamento",
+              "AFASTADO": "Afastamento",
+              "AFASTADO INSS": "Afastamento",
+              "TRANSFERÊNCIA MELICIDADE": "Transferido",
+              "TRANSFERÊNCIA BRSP11": "Transferido",
+              "TRANSFERÊNCIA BRSP04": "Transferido",
+              "TRANSFERÊNCIA BRSP02": "Transferido",
+              "TRANSFERÊNCIA BRSP15": "Transferido",
+              "TRANSFERÊNCIA SORTATION": "Transferido",
+              "TRANSFERÊNCIA BRRC01": "Transferido",
+              "TRANSFERÊNCIA BRSP14": "Transferido",
+              "TRANSFERÊNCIA BRSP06": "Transferido"
+            };
+            statusAbs = mapaStatusHC[statusHC] || "";
+          }
+
+          let classStatusAbs = "";
+          let classStatusHC = "";
+
+          if (["Presente","Treinamento-Int", "Treinamento-REP-III","Treinamento-Ext"].includes(statusAbs)) classStatusAbs = "status-verde";
+          else if (statusAbs === "Presenca-HE") classStatusAbs = "status-verde2";
+          else if (["Afastamento","Atestado","Declaracao-de-Horas"].includes(statusAbs)) classStatusAbs = "status-laranja";
+          else if (["Licenca","Transferido"].includes(statusAbs)) classStatusAbs = "status-laranjaForte";
+          else if (statusAbs === "Banco-de-Horas") classStatusAbs = "status-roxo";
+          else if (["Sinergia SP014","Sinergia CX","Sinergia INB","Sinergia LOS","Sinergia MG01","Sinergia MWH","Sinergia OUT","Sinergia QUA","Sinergia RC01","Sinergia RET","Sinergia SP011","Sinergia SP02","Sinergia SP03","Sinergia SP04","Sinergia SP05","Sinergia SP06","Sinergia SP09","Sinergia INV","Sinergia RET","Sinergia QUA","Sinergia SVC","Sinergia RC-SP10","Sinergia Sortation","Sinergia Insumo"].includes(statusAbs)) classStatusAbs = "status-roxoFraco";
+          else if (["Folga-Escala", "OWNboarding"].includes(statusAbs)) classStatusAbs = "status-azul";
+          else if (statusAbs === "Ferias") classStatusAbs = "status-azul2";
+          else if (statusAbs === "Desligado") classStatusAbs = "status-vermelho";
+
+          if (statusHC === "DESLIGADO") classStatusHC = "status-vermelho";
+          else if (["AFASTADO", "AFASTADA GRAVIDEZ"].includes(statusHC)) classStatusHC = "status-laranja";
+          else if (statusHC === "ATIVO") classStatusHC = "status-verde";
+
+          html += `<tr data-editado="false">
+            <td>${linha.AREA_HEAD}</td>
+            <td>${linha.IDGROOT}</td>
+            <td>${linha.LDAP}</td>
+            <td>${linha.COLABORADOR}</td>
+            <td>${linha.TURNO}</td>
+            <td>${linha.ESCALA}</td>
+            <td class="turma-${(linha.TURMA_ESCALA || "").toLowerCase()}">${linha.TURMA_ESCALA}</td>
+            <td>${linha.EMPRESA}</td>
+            <td>${linha.PROCESSO}</td>
+            <td class="${classStatusHC}">${linha.STATUS_HC}</td>
+            <td class="${classStatusAbs}">
+              ${
+                statusHC === "DESLIGADO" || statusAbs === "Banco-de-Horas" ? statusAbs : `
+                <select class="status-select" data-index="${index}" onchange="marcarEditado(this); toggleQtdDiasInput(this)">
+                  <option value="">Selecione</option>
+                  ${[
+                    "Folga-Escala","Falta","Atestado","Atestado-Acd-Trab","Decl-Medica","Declaracao-de-Horas","Presente","Presenca-HE","Banco-de-Horas","Transferido","Transferido-Area","Treinamento-Ext","Treinamento-Int","Treinamento-REP-III","Ferias","Fretado","Afastamento","Afastamento-Acd-Trab","Licenca","Sinergia SP014","Sinergia CX","Sinergia INB","Sinergia LOS","Sinergia MG01","Sinergia MWH","Sinergia OUT","Sinergia QUA","Sinergia RC01","Sinergia RET","Sinergia SP011","Sinergia SP02","Sinergia SP03","Sinergia SP04","Sinergia SP05","Sinergia SP06","Sinergia SP09","Sinergia INV","Sinergia RET","Sinergia QUA","Sinergia SVC","Sinergia RC-SP10","Sinergia Sortation","Sinergia Insumo","Atividade-Externa","OWNboarding","Suspensao"
+                  ].map(opt => `<option value="${opt}" ${statusAbs === opt ? "selected" : ""}>${opt}</option>`).join("")}
+                </select>`
+              }
+            </td>
+            <td>${
+              ["Transferido","OWNboarding","Atestado","Banco-de-Horas","Afastamento","Licenca","Atestado-Acd-Trab","Ferias","Treinamento-Ext","Treinamento-Int","Treinamento-REP-III","Fretado","Afastamento-Acd-Trab","Sinergia SP014","Sinergia CX","Sinergia INB","Sinergia LOS","Sinergia MG01","Sinergia MWH","Sinergia OUT","Sinergia QUA","Sinergia RC01","Sinergia RET","Sinergia SP011","Sinergia SP02","Sinergia SP03","Sinergia SP04","Sinergia SP05","Sinergia SP06","Sinergia SP09","Sinergia INV","Sinergia SVC","Sinergia RC-SP10","Sinergia Sortation","Sinergia Insumo","Atividade-Externa","Suspensao"].includes(linha.STATUS_abs)
+                ? `<span>${linha.DIAS_RESTANTES} dia(s)</span>`
+                : `<input type="number" class="qtd-dias" style="display:none;width:100%;" min="1" oninput="marcarEditado(this)" />`
+            }</td>
+          </tr>
+          <tr class="campo-motivo-desligamento" style="display: none;">
+            <td colspan="12">
+              <input type="text" class="motivo-input" placeholder="Informe o motivo do desligamento e a data" style="width: 100%;" oninput="marcarEditado(this)" />
+            </td>
+          </tr>`;
+        });
+
+        html += "</tbody></table>";
+        document.querySelector(".tabela-scroll").innerHTML = html;
+
+        // Mostrar/ocultar campo de motivo
+        document.querySelectorAll(".status-select").forEach(select => {
+          select.addEventListener("change", function () {
+            const linha = this.closest("tr");
+            const motivoRow = linha.nextElementSibling;
+            if (this.value === "Desligado") {
+              motivoRow.style.display = "";
+            } else {
+              motivoRow.style.display = "none";
+            }
+          });
+        });
+
+        const botaoExistente = document.getElementById("botao-registrar");
+        if (botaoExistente) botaoExistente.remove();
+        const botaoRegistrar = document.createElement("button");
+        botaoRegistrar.textContent = "Registrar Todos";
+        botaoRegistrar.className = "selecionar";
+        botaoRegistrar.id = "botao-registrar";
+        botaoRegistrar.onclick = registrarTodos;
+        document.getElementById("botoes-container").appendChild(botaoRegistrar);
+
+        verificarColunaQtdDias();
+      }).responderNome(nomeSelecionado);
+    }
+
+    function toggleQtdDiasInput(selectElement) {
+      const row = selectElement.closest("tr");
+      const input = row.querySelector(".qtd-dias");
+      const valor = selectElement.value;
+
+      const datasSelecionadasRaw = document.getElementById("datasSelecionadas").value;
+      const datasSelecionadas = datasSelecionadasRaw.split(",").map(d => d.trim()).filter(d => d !== "");
+      const apenasUmaDataSelecionada = datasSelecionadas.length === 1;
+
+      const statusComQtdDias = [
+        "OWNboarding","Atestado","Banco-de-Horas","Afastamento","Licenca","Atestado-Acd-Trab",
+        "Ferias","Treinamento-Ext","Treinamento-Int","Treinamento-REP-III","Fretado",
+        "Afastamento-Acd-Trab","Sinergia SP014","Sinergia CX","Sinergia INB","Sinergia LOS",
+        "Sinergia MG01","Sinergia MWH","Sinergia OUT","Sinergia QUA","Sinergia RC01",
+        "Sinergia RET","Sinergia SP011","Sinergia SP02","Sinergia SP03","Sinergia SP04",
+        "Sinergia SP05","Sinergia SP06","Sinergia SP09","Sinergia INV","Sinergia SVC",
+        "Sinergia RC-SP10","Sinergia Sortation","Sinergia Insumo","Atividade-Externa","Suspensao"
+      ];
+
+      if (statusComQtdDias.includes(valor)) {
+        if (apenasUmaDataSelecionada) {
+          input.style.display = "inline";
+          input.style.width = "100%";
+          input.value = "";
+          input.readOnly = false;
+        } else {
+          input.style.display = "none";
+          input.value = "";
+          input.readOnly = true;
+          if (!window.alertQtdDiasExibido) {
+            alert("A edição da quantidade de dias só é permitida quando uma única data está selecionada.");
+            window.alertQtdDiasExibido = true;
+          }
+        }
+      } else if (valor === "Desligado" || valor === "Transferido") {
+        input.style.display = "none";
+        input.value = "31";
+        input.readOnly = true;
+      } else {
+        input.style.display = "none";
+        input.value = "";
+        input.readOnly = false;
+      }
+      verificarColunaQtdDias();
+    }
+
+    function verificarColunaQtdDias() {
+      const inputs = document.querySelectorAll(".qtd-dias");
+      const coluna = document.querySelectorAll("th")[11];
+      let mostrar = false;
+      inputs.forEach(input => { if (input.style.display === "inline") mostrar = true; });
+      if (coluna) coluna.style.display = mostrar ? "" : "none";
+      document.querySelectorAll("tbody tr").forEach(tr => {
+        const td = tr.children[11];
+        if (td) td.style.display = mostrar ? "" : "none";
+      });
+    }
+
+    function registrarTodos() {
+      const nome = document.getElementById("nome").value;
+      const datasInput = document.getElementById("datasSelecionadas").value;
+      if (!datasInput) {
+        alert("Por favor, informe ao menos uma data.");
+        return;
+      }
+
+      // Garante "hoje ou futuro" mesmo se colarem datas no input
+      const toDate = (s) => { const [dd,mm,yyyy]=s.split("/").map(n=>parseInt(n,10)); return new Date(yyyy, mm-1, dd); };
+      const hoje = new Date(); hoje.setHours(0,0,0,0);
+      let datasSelecionadas = datasInput.split(",").map(d => d.trim()).filter(Boolean);
+      const removidas = [];
+      datasSelecionadas = datasSelecionadas.filter(d => {
+        const dt = toDate(d); dt.setHours(0,0,0,0);
+        const ok = dt >= hoje;
+        if (!ok) removidas.push(d);
+        return ok;
+      });
+      if (removidas.length) alert("Removidas por regra (somente hoje ou futuras):\n" + removidas.join(", "));
+      if (datasSelecionadas.length === 0) {
+        alert("Nenhuma data válida restante. Selecione hoje ou datas futuras.");
+        return;
+      }
+
+      const selects = document.querySelectorAll("select.status-select");
+      const linhas = [];
+
+      selects.forEach(select => {
+        const row = select.closest("tr");
+        if (row && row.getAttribute("data-editado") === "true") {
+          const cells = row.querySelectorAll("td");
+          const qtdInput = row.querySelector(".qtd-dias");
+          const status = select.value;
+          let qtdDias = 0;
+          if (status === "Desligado") {
+            qtdDias = 31;
+          } else if (qtdInput && qtdInput.value) {
+            qtdDias = parseInt(qtdInput.value);
+          }
+          const motivoInput = row.nextElementSibling?.querySelector(".motivo-input");
+          const motivoDesligamento = motivoInput ? motivoInput.value.trim() : "";
+          linhas.push({
+            AREA_HEAD: cells[0].textContent.trim(),
+            IDGROOT: cells[1].textContent.trim(),
+            LDAP: cells[2].textContent.trim(),
+            COLABORADOR: cells[3].textContent.trim(),
+            TURNO: cells[4].textContent.trim(),
+            ESCALA: cells[5].textContent.trim(),
+            TURMA_ESCALA: cells[6].textContent.trim(),
+            EMPRESA: cells[7].textContent.trim(),
+            PROCESSO: cells[8].textContent.trim(),
+            STATUS_HC: cells[9].textContent.trim(),
+            STATUS_abs: status,
+            QTD_DIAS: qtdDias,
+            MOTIVO_DESLIGAMENTO: motivoDesligamento
+          });
+        }
+      });
+
+      if (linhas.length === 0) {
+        alert("Nenhuma linha editada para salvar!");
+        return;
+      }
+
+      google.script.run.withSuccessHandler(function (mensagem) {
+        alert(mensagem);
+        enviarNome();
+      }).registrarPresenca(nome, linhas, datasSelecionadas);
+    }
+
+    function fecharModal() {
+      document.getElementById("ajuda-modal").style.display = "none";
+    }
+    function materialTutorial(){
+      window.open("https://docs.google.com/presentation/d/1-C4QuPmK5vGeUaBPHN9HtPO8xJ9B_eoI1NN3Enq4mnE/edit?slide=id.p#slide=id.p", "_blank");
+    }
+    function carregarPagina(pagina) {
+      google.script.run.withSuccessHandler(function(html) {
+        document.getElementById('conteudo').innerHTML = html;
+      }).incluirPagina(pagina);
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <div class="navbar">
+      <div class="navbar-content">
+        <img src="https://lh5.googleusercontent.com/proxy/OWOdTJ1zkkZ7YU0-dpOIK9TjofSs6nimeI7LfWgZJFC0Ru0n4LlZMiGMAiCkywPe1jTXPrLNB_Q9X09pVQb0YZZ3AOoM-EJ8POnVioajQuCP0EPLj7KIVJpCCA" id="logo"/>
+        <h1>Lançamento futuro</h1>
+        <div class="nav"></div>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="content">
+      <h2>Selecione o Team Leader</h2>
+
+      <div id="ajuda-modal">
+        <div class="ajuda-conteudo">
+          <h3>Como funciona o sistema?</h3>
+          <p>Olá, Team Leader! esta aba serve para você fazer lançamentos futuros</p>
+          <p>Para entender melhor todas as funcionalidades da ferramenta, acesse o material explicativo completo abaixo:</p>
+          <button onclick="materialTutorial()">Ver material</button>
+          <button onclick="fecharModal()" class="fecharmodal">Fechar</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <select id="nome">
+          <option disabled selected>Selecione um nome</option>
+        </select>
+        <input type="text" id="datasSelecionadas" placeholder="Selecione as datas" style="padding: 10px; border-radius: 10px; border: 2px solid var(--color3);" readonly/>
+        <button onclick="enviarNome()" class="selecionar">Carregar Equipe</button>
+      </div>
+
+      <div id="resultado">
+        <div class="tabela-scroll"></div>
+      </div>
+    </div>
+  </main>
+  <center><span class="versionCode">Versão 0.<span class="versionCode2">1</span>.5</span></center>
+</body>
+</html>
